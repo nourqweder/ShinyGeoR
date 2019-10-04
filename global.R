@@ -1,0 +1,6 @@
+library(shiny)
+library(leaflet)
+library(dplyr)
+devtools::install_github("nourqweder/RAPI", subdir="RAPI", quiet = TRUE)
+library(geoloc)
+df <- readRDS("./sample_data.rds")
