@@ -22,54 +22,7 @@ shinyServer(function(input, output) {
   center.lat <- 30
   center.long <- 11
   init.zoom <- 2
-  mydb <- reactive({
-    #if the user choose address
-
-    #----------------------------------------------------------------------------------------
-    if (input$googleMethodInput == "latlng") {
-      
-      m <- leaflet(data = addressInfo) %>%
-        addTiles() %>%
-        # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
-        addMarkers(lng = as.numeric(input$longText), 
-                   lat = as.numeric(input$latiText),
-                   popup = ~as.character(address))
-    }
-    else if (input$googleMethodInput == "CSV") {
-      m <- leaflet(data = df) %>%
-        addTiles() %>%
-        # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
-        addMarkers(lng = ~Longitude, 
-                   lat = ~Latitude,
-                   popup = paste("Offense", df$Offense, "<br>",
-                                 "Year:", df$CompStat.Year, "<br>"))
-    }
-    #----------------------------------------------------------------------------------------
-    
-    
-    #----------------------------------------------------------------------------------------
-    #  addressInfo <- subset(addressInfo, addressInfo$address != "ERROR")
-    # empty dataframe
-    if (input$displayMode == "classic") {
-      return( leaflet(data = addressInfo) %>%
-               setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
-               addTiles() %>%
-               addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
-    } else if (input$displayMode == "satellite") {
-      
-      return( leaflet(data =  addressInfo) %>%
-               setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
-               addTiles(urlTemplate="http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}") %>%
-               addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
-      
-    } else if (input$displayMode == "night") {
-      
-      return( leaflet(data = addressInfo) %>%
-               setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
-               addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") %>%
-               addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
-      
-    }  })
+  
   
   if (input$googleMethodInput == "latlng") {
     
@@ -89,7 +42,29 @@ shinyServer(function(input, output) {
                  popup = paste("Offense", df$Offense, "<br>",
                                "Year:", df$CompStat.Year, "<br>"))
   }
-  
+  #----------------------------------------------------------------------------------------
+  #  addressInfo <- subset(addressInfo, addressInfo$address != "ERROR")
+  # empty dataframe
+  if (input$displayMode == "classic") {
+    m <- leaflet(data = addressInfo) %>%
+              setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+              addTiles() %>%
+              addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address))
+  } else if (input$displayMode == "satellite") {
+    
+    return( leaflet(data =  addressInfo) %>%
+              setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+              addTiles(urlTemplate="http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}") %>%
+              addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
+    
+  } else if (input$displayMode == "night") {
+    
+    m <- leaflet(data = addressInfo) %>%
+      setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+      addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") %>%
+      addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address))
+    
+  }
   return(m)
   }) 
 })
