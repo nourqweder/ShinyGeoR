@@ -19,9 +19,9 @@ shinyServer(function(input, output) {
     addressInfo <- data.frame(Latitude = numeric(0), Longitude = numeric(0), address = character(0))
     # initial view parameters  to centered the map
     # initial view parameters (whole map centered)
-    center.lat <- 30
-    center.long <- 11
-    init.zoom <- 2
+    center.lat <- 58.3
+    center.long <- 15
+    init.zoom <- 20
     
     if (input$googleMethodInput == "DB") {
       m <- leaflet(data = df) %>%
@@ -39,6 +39,18 @@ shinyServer(function(input, output) {
         # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
         addMarkers(lng = as.numeric(input$longText), 
                    lat = as.numeric(input$latiText))
+    }
+    else if (input$googleMethodInput == "CV") {
+      myfile <- input$inputFile
+      dataCv <- readCSVFile(myfile)
+  print(dataCv)
+      m <- leaflet(data = dataCv) %>%
+        addTiles() %>%
+        addMarkers(lng = ~Longitude, 
+                   lat = ~Latitude,
+                   popup = paste("Offense", df$Offense, "<br>",
+                                 "Year:", df$CompStat.Year))
+      
     }
     
     #----------------------------------------------------------------------------------------
@@ -58,7 +70,16 @@ shinyServer(function(input, output) {
       m <- leaflet(data = addressInfo) %>%
         setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
         addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") 
-    } 
+      
+    } else if (input$displayMode == "mesonet") {
+      m <- leaflet(data = addressInfo) %>% addTiles() %>% setView(-93.65, 42.0285, zoom = 4) %>%
+        addWMSTiles(
+          "http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi",
+          layers = "nexrad-n0r-900913",
+          options = WMSTileOptions(format = "image/png", transparent = TRUE),
+          attribution = "Weather data © 2012 IEM Nexrad"
+        )
+    }
     
     return(m)
   }) 

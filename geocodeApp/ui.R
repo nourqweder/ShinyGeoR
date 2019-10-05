@@ -44,7 +44,8 @@ shinyUI(fluidPage(
             selectInput("displayMode", "Select the display mode:", 
                         c("Classic" = "classic",
                           "Satellite" = "satellite",
-                          "Night" = "night"))         
+                          "Night" = "night",
+                        "Mesonet" = "mesonet"))         
         ),
         
         # Show a plot of the generated map according to user input
