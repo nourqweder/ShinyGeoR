@@ -19,9 +19,9 @@ shinyUI(fluidPage(
     sidebarLayout(
         sidebarPanel (
             selectInput("googleMethodInput","Select Geocoding request and response method according to:",
-                        c(
+                        c("Display Newyork data from DB" = "DB",
                           "latitude/longitude lookup" = "latlng",
-                          "Display NewYork city Data from CSV file" = "CSV")),
+                        "Upload your CSV file" = "CSV")),
            
             conditionalPanel(
                 condition = "input.googleMethodInput == 'latlng'",
