@@ -8,7 +8,8 @@
 #
 
 # Define UI for application that draws a histogram
-#library(leaflet)
+library(leaflet)
+library(shiny)
 shinyUI(fluidPage(
     
     # Application title
@@ -18,13 +19,10 @@ shinyUI(fluidPage(
     sidebarLayout(
         sidebarPanel (
             selectInput("googleMethodInput","Select Geocoding request and response method according to:",
-                        c("Address lookup" = "address",
+                        c(
                           "latitude/longitude lookup" = "latlng",
                           "CSV file" = "CSV")),
-            conditionalPanel(
-                condition = "input.googleMethodInput == 'address'",
-                textInput("addressText", "Type an address:", placeholder = "Smålandsvägen 42D, Mjölby")
-            ),
+           
             conditionalPanel(
                 condition = "input.googleMethodInput == 'latlng'",
                 textInput("latiText", "Enter a latitude value:", placeholder = "58.314960600000006"),
@@ -46,15 +44,7 @@ shinyUI(fluidPage(
             selectInput("displayMode", "Select the display mode:", 
                         c("Classic" = "classic",
                           "Satellite" = "satellite",
-                          "Night" = "night")),
-            
-            selectInput("transportationMode", "Select the transportation mode:", 
-                        c("Walking" = "walking",
-                          "Bike" = "bike",
-                          "Car" = "car") 
-            ),
-            textInput("apiKey", "Enter a a valid api Key:", placeholder = "A VALID API KEY HERE")
-            
+                          "Night" = "night"))         
         ),
         
         # Show a plot of the generated map according to user input

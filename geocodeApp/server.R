@@ -8,32 +8,28 @@
 #
 
 library(shiny)
-library(sf)
+library(geojsonio)
 library(mapview)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-  
+  output$distPlot <- renderLeaflet({
   # empty dataframe
-  addressInfo <- data.frame(latitude = numeric(0), longitude = numeric(0), address = character(0))
+  addressInfo <- data.frame(Latitude = numeric(0), Longitude = numeric(0), address = character(0))
   # initial view parameters  to centered the map
+  # initial view parameters (whole map centered)
   center.lat <- 30
   center.long <- 11
   init.zoom <- 2
   mydb <- reactive({
     #if the user choose address
-    if (input$googleMethodInput == "address") {
-      
-      addressInfo<- geocodeBylatlng(input$addressTxt)
-      if ((input$addressTxt != "") && (addressInfo$address != "ERROR")) {
-        center.long <- addressInfo$longitude
-        center.lat <- addressInfo$latitude
-        init.zoom <- 15
-      }
-    }
+
     #----------------------------------------------------------------------------------------
-    else if (input$googleMethodInput == "latlng") {
+   if (input$googleMethodInput == "latlng") {
       #prepare address parameter x, y
-      addressInfo <- geocodeBylatlng(paste0(input$latiText, ",",input$latiText))
+      addressInfo$latitude <- input$latiText # geocodeBylatlng(paste0(input$latiText, ",",input$longText))
+      addressInfo$longitude <- input$longText
+      addressInfo$address == "OK"
+      addressInfo$year== Sys.Date()
       if ((input$latiText != "") &&(input$latiText != "") && (addressInfo$address != "ERROR")) {
         center.long <- input$latiText
         center.lat <- input$latiText
@@ -66,23 +62,16 @@ shinyServer(function(input, output) {
                addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
       
     }  })
-
-
-   # data <- reactive({
-    #  ifelse(addressInfo$address != "ERROR",  x <- df, x <- addressInfo )#addressInfo
-#  })
+  
  
   
-   
-  output$distPlot <- renderLeaflet({
-    df <- mydb()
-    
     m <- leaflet(data = df) %>%
       addTiles() %>%
+     # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
       addMarkers(lng = ~Longitude, 
                  lat = ~Latitude,
                  popup = paste("Offense", df$Offense, "<br>",
-                               "Year:", df$CompStat.Year))
+                               "Year:", df$CompStat.Year, "<br>"))
     m
   }) 
 })
