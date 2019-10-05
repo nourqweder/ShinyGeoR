@@ -12,6 +12,8 @@ library(geojsonio)
 library(mapview)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
+  
+  
   output$distPlot <- renderLeaflet({
   # empty dataframe
   addressInfo <- data.frame(Latitude = numeric(0), Longitude = numeric(0), address = character(0))
@@ -24,17 +26,23 @@ shinyServer(function(input, output) {
     #if the user choose address
 
     #----------------------------------------------------------------------------------------
-   if (input$googleMethodInput == "latlng") {
-      #prepare address parameter x, y
-      addressInfo$latitude <- input$latiText # geocodeBylatlng(paste0(input$latiText, ",",input$longText))
-      addressInfo$longitude <- input$longText
-      addressInfo$address == "OK"
-      addressInfo$year== Sys.Date()
-      if ((input$latiText != "") &&(input$latiText != "") && (addressInfo$address != "ERROR")) {
-        center.long <- input$latiText
-        center.lat <- input$latiText
-        init.zoom <- 15
-      }
+    if (input$googleMethodInput == "latlng") {
+      
+      m <- leaflet(data = addressInfo) %>%
+        addTiles() %>%
+        # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+        addMarkers(lng = as.numeric(input$longText), 
+                   lat = as.numeric(input$latiText),
+                   popup = ~as.character(address))
+    }
+    else if (input$googleMethodInput == "CSV") {
+      m <- leaflet(data = df) %>%
+        addTiles() %>%
+        # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+        addMarkers(lng = ~Longitude, 
+                   lat = ~Latitude,
+                   popup = paste("Offense", df$Offense, "<br>",
+                                 "Year:", df$CompStat.Year, "<br>"))
     }
     #----------------------------------------------------------------------------------------
     
@@ -43,36 +51,46 @@ shinyServer(function(input, output) {
     #  addressInfo <- subset(addressInfo, addressInfo$address != "ERROR")
     # empty dataframe
     if (input$displayMode == "classic") {
-      return(leaflet(data = addressInfo) %>%
+      return( leaflet(data = addressInfo) %>%
                setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
                addTiles() %>%
                addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
     } else if (input$displayMode == "satellite") {
       
-      return(leaflet(data =  addressInfo) %>%
+      return( leaflet(data =  addressInfo) %>%
                setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
                addTiles(urlTemplate="http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}") %>%
                addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
       
     } else if (input$displayMode == "night") {
       
-      return(leaflet(data = addressInfo) %>%
+      return( leaflet(data = addressInfo) %>%
                setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
-               # addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") %>%
+               addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") %>%
                addMarkers(lng = ~longitude, ~latitude, popup = ~as.character(address)))
       
     }  })
   
- 
-  
+  if (input$googleMethodInput == "latlng") {
+    
+    m <- leaflet(data = addressInfo) %>%
+      addTiles() %>%
+      # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+      addMarkers(lng = as.numeric(input$longText), 
+                 lat = as.numeric(input$latiText),
+                 popup = ~as.character(address))
+  }
+  else if (input$googleMethodInput != "latlng") {
     m <- leaflet(data = df) %>%
       addTiles() %>%
-     # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+      # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
       addMarkers(lng = ~Longitude, 
                  lat = ~Latitude,
                  popup = paste("Offense", df$Offense, "<br>",
                                "Year:", df$CompStat.Year, "<br>"))
-    m
+  }
+  
+  return(m)
   }) 
 })
 
