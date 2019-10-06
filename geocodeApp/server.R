@@ -8,17 +8,16 @@
 #
 
 library(shiny)
-library(geojsonio)
+library(RAPI)
 library(mapview)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   
-  
+  #myData <- re<ctive({
   output$distPlot <- renderLeaflet({
     # empty dataframe
     addressInfo <- data.frame(Latitude = numeric(0), Longitude = numeric(0), address = character(0))
     # initial view parameters  to centered the map
-    # initial view parameters (whole map centered)
     center.lat <- 58.3
     center.long <- 15
     init.zoom <- 6
@@ -27,22 +26,11 @@ shinyServer(function(input, output) {
       m <- leaflet(data = addressInfo) %>%
         addTiles() %>%
         #need function here to convert from input to address info
-        # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
+        
         addMarkers(lng = as.numeric(input$longText), 
                    lat = as.numeric(input$latiText))
     }
-    else if (input$googleMethodInput == "CV") {
-      myfile <- input$inputFile
-      dataCv <- readCSVFile(myfile)
-      print(dataCv)
-      m <- leaflet(data = dataCv) %>%
-        addTiles() %>%
-        addMarkers(lng = ~Longitude, 
-                   lat = ~Latitude,
-                   popup = paste("Offense", df$Offense, "<br>",
-                                 "Year:", df$CompStat.Year))
-      
-    }
+   
     else if (input$googleMethodInput == "DB") {
       m <- leaflet(data = df) %>%
         addTiles() %>%
@@ -52,7 +40,35 @@ shinyServer(function(input, output) {
                                  "Year:", df$CompStat.Year))
       
     }
-    
+    else if (input$googleMethodInput == "CSV") {
+      myfile <- input$inputFile
+      addressInfo <- getDataFromCSV(myfile)
+      m <- leaflet(data = addressInfo) %>%
+        addTiles() %>%
+        addMarkers(lng = ~Longitude, 
+                   lat = ~Latitude)
+      
+    }
+    else if (input$googleMethodInput == "address") {
+      # specific view parameters only if the user's input is correct
+      
+      addressInfo <- getAddressInfoByLocation(input$addressText, input$apiKey)
+      if (( addressInfo$address != "ERROR")) {
+        
+        center.lat <- addressInfo$Latitude
+        center.long <- addressInfo$Longitude
+        init.zoom <- 6
+      }
+      else
+        {
+        m <- leaflet(data = ) %>%
+          addTiles() %>%
+          addMarkers(lng = ~Longitude, 
+                     lat = ~Latitude,
+                     popup = paste("Offense", df$Offense, "<br>",
+                                   "Year:", df$CompStat.Year))
+      }
+    }
     
     #----------------------------------------------------------------------------------------
     #  addressInfo <- subset(addressInfo, addressInfo$address != "ERROR")
