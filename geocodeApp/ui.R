@@ -41,6 +41,11 @@ shinyUI(fluidPage(
                               '.tsv'
                           ))
             ),
+            conditionalPanel(
+                condition = "input.googleMethodInput == 'address'",
+                textInput("addressText", "Enter a location value:", placeholder = "smålandsvägen 42D"),
+                textInput("apiKey", "Enter a valid API KEY:", placeholder = "VALID API KEY")
+            ),
             
             selectInput("displayMode", "Select the display mode:", 
                         c("Classic" = "classic",
