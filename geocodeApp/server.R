@@ -21,21 +21,12 @@ shinyServer(function(input, output) {
     # initial view parameters (whole map centered)
     center.lat <- 58.3
     center.long <- 15
-    init.zoom <- 20
-    
-    if (input$googleMethodInput == "DB") {
-      m <- leaflet(data = df) %>%
-        addTiles() %>%
-        addMarkers(lng = ~Longitude, 
-                   lat = ~Latitude,
-                   popup = paste("Offense", df$Offense, "<br>",
-                                 "Year:", df$CompStat.Year))
-      
-    }
-    else if (input$googleMethodInput == "latlng") {
-      
+    init.zoom <- 6
+    if (input$googleMethodInput == "latlng") {
+      #addressInfo<- getCoordinator()
       m <- leaflet(data = addressInfo) %>%
         addTiles() %>%
+        #need function here to convert from input to address info
         # setView(lat = center.lat, lng = center.long, zoom = init.zoom) %>%
         addMarkers(lng = as.numeric(input$longText), 
                    lat = as.numeric(input$latiText))
@@ -43,7 +34,7 @@ shinyServer(function(input, output) {
     else if (input$googleMethodInput == "CV") {
       myfile <- input$inputFile
       dataCv <- readCSVFile(myfile)
-  print(dataCv)
+      print(dataCv)
       m <- leaflet(data = dataCv) %>%
         addTiles() %>%
         addMarkers(lng = ~Longitude, 
@@ -52,6 +43,16 @@ shinyServer(function(input, output) {
                                  "Year:", df$CompStat.Year))
       
     }
+    else if (input$googleMethodInput == "DB") {
+      m <- leaflet(data = df) %>%
+        addTiles() %>%
+        addMarkers(lng = ~Longitude, 
+                   lat = ~Latitude,
+                   popup = paste("Offense", df$Offense, "<br>",
+                                 "Year:", df$CompStat.Year))
+      
+    }
+    
     
     #----------------------------------------------------------------------------------------
     #  addressInfo <- subset(addressInfo, addressInfo$address != "ERROR")
