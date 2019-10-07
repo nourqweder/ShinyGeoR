@@ -21,6 +21,12 @@ shinyServer(function(input, output) {
     center.lat <- 58.3
     center.long <- 15
     init.zoom <- 6
+    
+    data <- reactive({
+      x <- df
+    })  
+    dfDB <- data()
+    
     if (input$googleMethodInput == "latlng") {
       #addressInfo<- getCoordinator()
       m <- leaflet(data = addressInfo) %>%
@@ -30,9 +36,10 @@ shinyServer(function(input, output) {
         addMarkers(lng = as.numeric(input$longText), 
                    lat = as.numeric(input$latiText))
     }
-   
+    
     else if (input$googleMethodInput == "DB") {
-      m <- leaflet(data = df) %>%
+      
+      m <- leaflet(data = dfDB) %>%
         addTiles() %>%
         addMarkers(lng = ~Longitude, 
                    lat = ~Latitude,
@@ -53,15 +60,15 @@ shinyServer(function(input, output) {
       # specific view parameters only if the user's input is correct
       
       addressInfo <- getAddressInfoByLocation(input$addressText, input$apiKey)
-      if (( addressInfo$address != "ERROR")) {
+      if (addressInfo$address != "ERROR") {
         
         center.lat <- addressInfo$Latitude
         center.long <- addressInfo$Longitude
         init.zoom <- 6
       }
       else
-        {
-        m <- leaflet(data = ) %>%
+      {
+        m <- leaflet(data =dfDB ) %>%
           addTiles() %>%
           addMarkers(lng = ~Longitude, 
                      lat = ~Latitude,

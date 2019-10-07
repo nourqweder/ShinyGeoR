@@ -1,6 +1,7 @@
 #' A Shiny app for RAPI package
 #' @title ShinyMAp
 #' @import shiny
+#' @export
 library(shiny)
 library(leaflet)
 library(dplyr)
